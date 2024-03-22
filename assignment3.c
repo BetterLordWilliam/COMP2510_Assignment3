@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-// A01372608
+// A01372608, A01343016
 
 typedef struct person{
     char *fname;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 
 
     innitList(head, optionP);
-    basicPrint(head);               // basic test print function
+    // basicPrint(head);               // basic test print function
     exportList(head);
     
     freeList(head);
@@ -246,11 +246,10 @@ void innitList(ListNode *head, int *option) {
         // Input ends with E, we are done
         if (track == pcount - 1 && strcmp("E\n", buff) == 0) {
             eF = 1;
-            break;
         }
         // Error with data in the file
         // There must be 4 things in each line
-        if (stat != 4) {
+        if (stat != 4 && eF != 1) {
             printErrorExit(head);  
         }
 

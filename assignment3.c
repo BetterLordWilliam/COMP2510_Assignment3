@@ -1,8 +1,11 @@
+// Will Otterbein       A01372608
+// Raymond Xie          A01343016
+// Lucas Laviolette     A01362479
+// Calvin Lee           A00922317
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
-// A01372608, A01343016
 
 typedef struct person{
     char *fname;

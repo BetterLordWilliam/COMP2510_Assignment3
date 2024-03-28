@@ -57,6 +57,7 @@ int main(int argc, char *argv[]){
     int listSize = 0, *listSizeP;
     listSizeP = &listSize;
     ListNode *head = malloc(sizeof(struct listNode));   // Actual list head
+
     head->tPerson = NULL;                               // make NULL
     head->next = NULL;                                  // make NULL
 
@@ -65,28 +66,17 @@ int main(int argc, char *argv[]){
         return 1;
 
     Person **arr = innitListN(listSizeP);
-    basicPrintA(arr, *listSizeP);
+
+    //basicPrintA(arr, *listSizeP);
     sortArray(arr, *listSizeP);
     exportArray(arr, *listSizeP);
     freeArray(arr, *listSizeP);
 
+    fclose(in);
+    fclose(out);
+
     return 0;
 }
-
-/**
- * printErrorExit:      Prints 'exit' to out file and closes files. Terminates program.
-*/
-/* void printErrorExit(ListNode* head) {
-    if (out != NULL) {
-        if (in != NULL) fclose(in);
-        fprintf(out, "error\n");
-        fclose(out);
-    } else {
-        printf("printErrorExit called incorrectly.\n");
-    }
-    freeList(head);
-    exit(1);
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
 
 /**
  * printErrorExit:      Prints 'exit' to out file and closes files. Terminates program.
@@ -104,39 +94,14 @@ void printErrorExitA(Person **arr, int aSize) {
 }
 
 /**
- * checkId:             Checks if a grade is in the valid range.
- * param id:            the grade that is going to be checked
-*/
-/* int checkId(ListNode *head, int id) {
-
-    if (head->next != NULL) {
-        ListNode *itr = head->next;
-
-        // Check for duplicates
-        while (itr != NULL) {
-            if (itr->tPerson->id == id)
-                return 0;
-            itr = itr->next;
-        }
-    }
-
-    // Check for negative
-    if (!(id >= 0))
-        return 0;
-
-    return 1;
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
-
-/**
- * checkId:             Checks if a grade is in the valid range.
- * param id:            the grade that is going to be checked
+ * checkId:             Checks if a id is unique.
+ * param id:            the id that is going to be checked
 */
 int checkIdN(Person **arr, int aSize, int id) {
-
     if (arr[0] != NULL) {
         // Check for duplicates
         for(int i = 0; i < aSize; i++) {
-            if (arr[i]->id == id)
+            if (arr[i] != NULL && arr[i]->id == id)
                 return 0;
         }
     }
@@ -144,7 +109,6 @@ int checkIdN(Person **arr, int aSize, int id) {
     // Check for negative
     if (!(id >= 0))
         return 0;
-
     return 1;
 }
 
@@ -183,29 +147,6 @@ int checkName(char *name) {
 }
 
 /**
- * inserPersonBasic:       Insert person into the list.
- * 
- * UNUSED
-*/
-/* void insertPersonBasic(ListNode *head, Person *newPerson) {
-    ListNode *newNode = malloc(sizeof(struct listNode));
-    newNode->tPerson = newPerson;
-    newNode->next = NULL;
-
-    if (head->next == NULL) {
-        head->next = newNode;
-        return;
-    }
-
-    ListNode *itr = head;
-    while (itr->next != NULL) {
-        itr = itr->next;
-    }
-    itr->next = newNode;
-    return;
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
-
-/**
  * comparePerson:           compares two persons to see what order they should fall in.
  * param *a:                first student
  * param *b:                second student
@@ -217,7 +158,7 @@ int comparePerson(Person *a, Person *b) {
     int lastNameComparison = strcmp(a->lname, b->lname);
     if (lastNameComparison != 0) return lastNameComparison;
 
-    return a->salary - b->salary;
+    return a->id - b->id;
 }
 
 /**
@@ -241,107 +182,6 @@ void sortArray(Person **arr, int aSize) {
         arr[i] = temp;
     }
 }
-
-/**
- * inserStudent:            Basic person into the list.
-*/
-/* void insertPerson(ListNode *head, Person *newPerson) {
-    ListNode* newNode = malloc(sizeof(struct listNode));
-    
-    if (newNode == NULL)
-        printErrorExit(head);
-
-    newNode->tPerson = newPerson;
-    newNode->next = NULL;
-
-    if (head->next == NULL || comparePerson(newPerson, head->next->tPerson) < 0) {
-        newNode->next = head->next;
-        head->next = newNode;
-        // The list is empty, put the person at the start
-    } else {
-        ListNode* current = head;
-        while (current->next != NULL && comparePerson(newPerson, current->next->tPerson) > 0) {
-            current = current->next;
-        } // Go to the end of the list so long as the preson comes after the current person
-        newNode->next = current->next;
-        current->next = newNode;
-    }
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
-
-/**
- * innitList:               reads the file input, creates student structures and inserts them into the list.
- * param *studentCount:     the number of numbers
- * param *option:           the option that the program will do
-*/
-/* void innitList(ListNode *head) {
-    char check = 0; // blank slate
-    int ncount = 0; // student count
-    int pcount = 0;
-    int eF = 0;
-
-    // Determine the number of students
-    while ((check = fgetc(in)) != EOF) {
-        if (check == '\n') {
-            ncount++;
-            pcount++;
-        }
-    }           
-    ncount -= 1;                                     // ensure correct number of persons (subtract option and E).
-    if (ncount == 0)
-        printErrorExit(head);
-
-    char buff[100];       
-    fseek(in, 0, SEEK_SET);                          // set buffer to the beginning of student list.
-    int track = 0;
-
-    while (fgets(buff, 100, in) != NULL && track < pcount) {
-        char *fNameT = malloc(15 * sizeof(char));
-        char *lNameT = malloc(15 * sizeof(char));
-        int idT = 0;
-        float salaryT = 0;
-
-        if (fNameT == NULL || lNameT == NULL)                   // Variable malloc success check
-            printErrorExit(head);
-        int stat = sscanf(buff, "%d,%[^ ] %[^,],%f\n", 
-            &idT, (char*)fNameT, (char*)lNameT, &salaryT);      // Keep track of success
-
-        // Input ends with E, we are done
-        if (track == pcount - 1 && strcmp("E\n", buff) == 0) {
-            eF = 1;
-            break;
-        }
-        // Error with data in the file
-        // There must be 4 things in each line
-        if (stat != 4 && eF != 1) {
-            printErrorExit(head);  
-        }
-
-        if (checkId(head, idT) && checkName(lNameT) 
-            && checkName(fNameT) && checkSalary(salaryT)) {
-            
-            // Get memory for the new person
-            Person *newPerson = malloc(sizeof(struct person));
-            if (newPerson == NULL)
-                printErrorExit(head);
-
-            // Assign the person parts
-            newPerson->lname = lNameT;
-            newPerson->fname = fNameT;
-            newPerson->id = idT;
-            newPerson->salary = salaryT;
-            insertPerson(head, newPerson);
-
-        } else {
-            printErrorExit(head);
-        }
-
-        track++;
-    }
-
-    // If the end of the file indicator 'E' was not detected, kill the program
-    if (eF == 0)
-        printErrorExit(head);
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
 
 /**
  * innitListN:              reads the file input, creates student structures and puts them into an array.
@@ -377,6 +217,7 @@ Person** innitListN(int *listSizeP) {
         char *lNameT = malloc(15 * sizeof(char));
         int idT = 0;
         float salaryT = 0;
+        
 
         if (fNameT == NULL || lNameT == NULL)                   // Variable malloc success check
             printErrorExitA(arr, *listSizeP);
@@ -393,12 +234,10 @@ Person** innitListN(int *listSizeP) {
         // There must be 4 things in each line
         if (stat != 4 && eF != 1) {
             printErrorExitA(arr, *listSizeP);
-            
         }
 
-        if (checkIdN(arr, *listSizeP, idT) && checkName(lNameT) 
+        if (checkIdN(arr, ncount, idT) && checkName(lNameT) 
             && checkName(fNameT) && checkSalary(salaryT)) {
-            
             // Get memory for the new person
             Person *newPerson = malloc(sizeof(struct person));
             if (newPerson == NULL) {
@@ -426,21 +265,6 @@ Person** innitListN(int *listSizeP) {
 }
 
 /**
- * freeList:                Frees memory used by the linkedlist.
- * param *head:             the start of the list   
-*/
-/* void freeList(ListNode *head) {
-    ListNode *itr = head->next;
-
-    while (itr != NULL) {
-        ListNode *temp = itr->next;
-        free(itr->tPerson);
-        free(itr);
-        itr = temp;
-    }
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
-
-/**
  * freeArray:               Frees memory used by array.
  * param **arr:             The array
  * param aSize:             The size of the array.
@@ -455,23 +279,6 @@ void freeArray(Person **arr, int aSize) {
 }
 
 /**
- * basicPrint:              basic print function, prints all student information. For testing purposes.
- * param *head:             the start of the list
-*/
-/* void basicPrint(ListNode *head) {
-    ListNode *itr = head->next;
-
-    while(itr != NULL) {
-        Person *cPerson = itr->tPerson;
-        printf("ID: %d %s %s Salary: %f\n", 
-            cPerson->id, cPerson->fname, cPerson->lname, 
-            cPerson->salary);
-
-        itr = itr->next;
-    }
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
-
-/**
  * basicPrint:              basic print function for the array version of the code.
  * param **arr:             pointer which is the array
 */
@@ -484,28 +291,6 @@ void basicPrintA(Person **arr, int aSize) {
         }
     }
 }
-
-/**
- * exportList:              Puts the list into the output file.
- * param *head:             the start of the list we are going to export
-*/
-/* void exportList(ListNode *head) {
-    if (out != NULL) {
-        ListNode *itr = head->next;
-        if (itr == NULL)
-            return;
-
-        while (itr != NULL) {
-            Person *cS = itr->tPerson;
-            fprintf(out, "%d,%s %s,%.2f\n", 
-                cS->id, cS->fname, cS->lname, cS->salary);
-            itr = itr->next;
-        }
-
-    } else {
-        printErrorExit(head);
-    }
-} */ // --> LinkedList version of the code LEGACY, NOT USED.
 
 /**
  * exportArray:             Puts the array contents into the output file.
